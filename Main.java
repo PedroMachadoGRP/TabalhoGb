@@ -31,7 +31,7 @@ public class Main {
                     locadora.consultaVeiculo(sc);
                     break;
                 case 2:
-
+                    locadora.realizarLocacao();
                     break;
                 case 3:
 
