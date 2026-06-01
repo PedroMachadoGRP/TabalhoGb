@@ -8,10 +8,10 @@ public class Locacao {
     int qt_dias_realizado;
 
     public double valorDiarias(){
-        return 0;
+        return qt_dias * veiculo.getValor_diaria();
     }
 
     public double valorKmRodado(){
-        return 0;
+        return km_rodado * veiculo.getValor_km_rodado();
     }
 }
