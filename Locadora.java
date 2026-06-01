@@ -96,6 +96,88 @@ public class Locadora {
 
     public void realizarLocacao() {
 
+    Scanner sc = new Scanner(System.in);
+
+    System.out.print("Informe a cidade de origem: ");
+    String cidade = sc.nextLine();
+
+    ArrayList<Veiculo> disponiveis = new ArrayList<>();
+
+    for (Veiculo v : veiculos) {
+        if (v.isDisponivel() &&
+                v.getCidade().equalsIgnoreCase(cidade)) {
+
+            disponiveis.add(v);
+        }
+    }
+
+    if (disponiveis.isEmpty()) {
+        System.out.println("Nenhum veículo disponível nesta cidade.");
+        return;
+    }
+
+    imprimirTabelaVeiculos(disponiveis);
+
+    System.out.print("Informe o código do veículo: ");
+    int codigo = sc.nextInt();
+    sc.nextLine();
+
+    Veiculo escolhido = null;
+
+    for (Veiculo v : disponiveis) {
+        if (v.getCodigo() == codigo) {
+            escolhido = v;
+            break;
+        }
+    }
+
+    if (escolhido == null) {
+        System.out.println("Veículo não encontrado.");
+        return;
+    }
+
+    System.out.print("Informe o nome do cliente: ");
+    String cliente = sc.nextLine();
+
+    for (Locacao l : locacoes) {
+        if (l.cliente != null &&
+                l.cliente.equalsIgnoreCase(cliente) &&
+                !l.veiculo.isDisponivel()) {
+
+            System.out.println("Este cliente já possui uma locação ativa.");
+            return;
+        }
+    }
+
+    System.out.print("Informe a quantidade de diárias: ");
+    int dias = sc.nextInt();
+    sc.nextLine();
+
+    double valorTotal = dias * escolhido.getValor_diaria();
+
+    System.out.printf("Valor total das diárias: R$ %.2f%n", valorTotal);
+
+    System.out.print("Deseja confirmar a locação? (S/N): ");
+    String resposta = sc.nextLine();
+
+    if (!resposta.equalsIgnoreCase("S")) {
+        System.out.println("Locação cancelada.");
+        return;
+    }
+
+    Locacao locacao = new Locacao();
+    locacao.veiculo = escolhido;
+    locacao.cliente = cliente;
+    locacao.origem = cidade;
+    locacao.qt_dias = dias;
+
+    locacoes.add(locacao);
+
+    escolhido.setDisponivel(false);
+
+    dadosAlterados = true;
+
+    System.out.println("Locação realizada com sucesso!");
     }
 
     public void consultaLocacao() {
