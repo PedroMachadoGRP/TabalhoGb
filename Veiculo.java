@@ -10,7 +10,6 @@ public class Veiculo {
     private double valor_km_rodado;
     private static String separador = ";";
 
-
     public Veiculo(int codigo, String modelo, String cor, int ano, int odomentro, String cidade, boolean disponivel,
             double valor_diaria, double valor_km_rodado) {
 
@@ -25,11 +24,21 @@ public class Veiculo {
         this.valor_km_rodado = valor_km_rodado;
     }
 
+    public Veiculo() {
+
+    }
+
     public int getCodigo() {
         return codigo;
     }
 
     public void setCodigo(int codigo) {
+
+        if (codigo <= 0) {
+            System.out.println("O codigo tem que ser positivo");
+            return;
+        }
+
         this.codigo = codigo;
     }
 
@@ -38,6 +47,11 @@ public class Veiculo {
     }
 
     public void setModelo(String modelo) {
+
+        if (modelo == null || modelo.trim().isEmpty()) {
+            System.out.println("Você deve inserir um modelo");
+            return;
+        }
         this.modelo = modelo;
     }
 
@@ -46,6 +60,11 @@ public class Veiculo {
     }
 
     public void setCor(String cor) {
+        if (cor == null || cor.trim().isEmpty()) {
+            System.out.println("Você deve inserir uma cor");
+            return;
+        }
+
         this.cor = cor;
     }
 
@@ -54,6 +73,11 @@ public class Veiculo {
     }
 
     public void setAno(int ano) {
+
+        if (ano < 0) {
+            System.out.println("O ano tem que ser maior que 0");
+            return;
+        }
         this.ano = ano;
     }
 
@@ -62,14 +86,24 @@ public class Veiculo {
     }
 
     public void setOdomentro(int odomentro) {
+        if (odomentro < 0) {
+            System.out.println("O odometro tem que ser positivo");
+            return;
+        }
         this.odomentro = odomentro;
     }
 
     public String getCidade() {
+
         return cidade;
     }
 
     public void setCidade(String cidade) {
+
+        if (cidade == null || cidade.trim().isEmpty()) {
+            System.out.println("Você deve inserir uma cidade");
+            return;
+        }
         this.cidade = cidade;
     }
 
@@ -86,6 +120,10 @@ public class Veiculo {
     }
 
     public void setValor_diaria(double valor_diaria) {
+        if (valor_diaria < 0) {
+            System.out.println("o valor da diaria tem que ser maior que zero e não pode ser negativo");
+            return;
+        }
         this.valor_diaria = valor_diaria;
     }
 
@@ -94,11 +132,47 @@ public class Veiculo {
     }
 
     public void setValor_km_rodado(double valor_km_rodado) {
+
+        if (valor_km_rodado < 0) {
+            System.out.println("o valor pro km  tem que ser maior que zero e não pode ser negativo");
+            return;
+        }
         this.valor_km_rodado = valor_km_rodado;
     }
 
     public String serializar() {
-        return System.lineSeparator() + getCodigo() + separador + getModelo() + separador + getCor() + separador + getAno() + separador + getOdomentro() + separador + getCidade() + separador  + isDisponivel() + separador + getValor_diaria() + separador + getValor_km_rodado();
+        return System.lineSeparator() + getCodigo() + separador + getModelo() + separador + getCor() + separador
+                + getAno() + separador + getOdomentro() + separador + getCidade() + separador + isDisponivel()
+                + separador + getValor_diaria() + separador + getValor_km_rodado();
     }
 
+    public static Veiculo deserializar(String linha) {
+
+        String[] campos = linha.split("\t", -1);
+        Veiculo veiculo = new Veiculo();
+        veiculo.setCodigo(Integer.parseInt(campos[0].trim()));
+        veiculo.setModelo(campos[1].isEmpty() ? "N/A" : campos[1]);
+        veiculo.setCor(campos[2].isEmpty() ? "N/A" : campos[2]);
+        veiculo.setAno(Integer.parseInt(campos[3].trim()));
+        veiculo.setOdomentro(Integer.parseInt(campos[4].trim()));
+        veiculo.setCidade(campos[5].isEmpty() ? "N/A" : campos[5]);
+        veiculo.setDisponivel(Boolean.parseBoolean(campos[6].trim()));
+        veiculo.setValor_diaria(Double.parseDouble(campos[7].trim()));
+        veiculo.setValor_km_rodado(Double.parseDouble(campos[8].trim()));
+        return veiculo;
+    }
+
+    @Override
+    public String toString() {
+        return "Veiculo [Codigo=" + getCodigo() + ", Modelo=" + getModelo() + ", Cor=" + getCor() + ", Ano=" + getAno()
+                + ", Odometro=" + getOdomentro() + ", Cidade=" + getCidade() + ", disponivel=" + isDisponivel()
+                + ", valor diaria=" + getValor_diaria() + ", valor por km rodado=" + getValor_km_rodado() + "]";
+    }
+
+    public static String cabecalho() {
+        return String.format(
+                "%-6s %-20s %-12s %-6s %-10s %-20s %-12s %-12s %-10s",
+                "Cód", "Modelo", "Cor", "Ano", "Odômetro",
+                "Cidade", "Situação", "Vlr/Diária", "Vlr/Km");
+    }
 }
