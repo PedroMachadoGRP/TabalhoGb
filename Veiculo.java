@@ -141,9 +141,9 @@ public class Veiculo {
     }
 
     public String serializar() {
-        return System.lineSeparator() + getCodigo() + separador + getModelo() + separador + getCor() + separador
-                + getAno() + separador + getOdomentro() + separador + getCidade() + separador + isDisponivel()
-                + separador + getValor_diaria() + separador + getValor_km_rodado();
+            return getCodigo() + "\t" + getModelo() + "\t" + getCor() + "\t"
+            + getAno() + "\t" + getOdomentro() + "\t" + getCidade() + "\t"
+            + isDisponivel() + "\t" + getValor_diaria() + "\t" + getValor_km_rodado();
     }
 
     public static Veiculo deserializar(String linha) {
@@ -156,7 +156,7 @@ public class Veiculo {
         veiculo.setAno(Integer.parseInt(campos[3].trim()));
         veiculo.setOdomentro(Integer.parseInt(campos[4].trim()));
         veiculo.setCidade(campos[5].isEmpty() ? "N/A" : campos[5]);
-        veiculo.setDisponivel(Boolean.parseBoolean(campos[6].trim()));
+        veiculo.setDisponivel(campos[6].trim().equalsIgnoreCase("S"));
         veiculo.setValor_diaria(Double.parseDouble(campos[7].trim()));
         veiculo.setValor_km_rodado(Double.parseDouble(campos[8].trim()));
         return veiculo;
@@ -164,9 +164,12 @@ public class Veiculo {
 
     @Override
     public String toString() {
-        return "Veiculo [Codigo=" + getCodigo() + ", Modelo=" + getModelo() + ", Cor=" + getCor() + ", Ano=" + getAno()
-                + ", Odometro=" + getOdomentro() + ", Cidade=" + getCidade() + ", disponivel=" + isDisponivel()
-                + ", valor diaria=" + getValor_diaria() + ", valor por km rodado=" + getValor_km_rodado() + "]";
+        return String.format(
+        "%-6d %-20s %-12s %-6d %-10d %-20s %-12s %-12.2f %-10.2f",
+        getCodigo(), getModelo(), getCor(), getAno(), getOdomentro(),
+        getCidade(), isDisponivel() ? "Disponível" : "Alugado",
+        getValor_diaria(), getValor_km_rodado()
+    );
     }
 
     public static String cabecalho() {

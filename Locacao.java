@@ -14,4 +14,10 @@ public class Locacao {
     public double valorKmRodado(){
         return km_rodado * veiculo.getValor_km_rodado();
     }
+
+    public String serializar() {
+        return veiculo.getCodigo() + "\t" + cliente + "\t" + origem + "\t" + 
+               (destino != null ? destino : "") + "\t" + km_rodado + "\t" + 
+               qt_dias + "\t" + qt_dias_realizado;
+    }
 }

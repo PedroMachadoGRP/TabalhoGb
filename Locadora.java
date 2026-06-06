@@ -29,8 +29,8 @@ public class Locadora {
 
         try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
             String linha;
-            while ((linha = br.readLine()) != null) {
-                linha = linha.trim();
+        while ((linha = br.readLine()) != null) {
+            linha = linha.trim();
                 if (linha.isEmpty())
                     continue;
                 try {
@@ -46,15 +46,29 @@ public class Locadora {
     }
 
     public void salvaDados() {
-
+    try (java.io.PrintWriter pwV = new java.io.PrintWriter(new java.io.FileWriter("veiculos.txt"));
+         java.io.PrintWriter pwL = new java.io.PrintWriter(new java.io.FileWriter("locacoes.txt"))) {
+        
+        for (Veiculo v : veiculos)
+            pwV.println(v.serializar());
+        
+        for (Locacao l : locacoes)
+            pwL.println(l.serializar());
+        
+        dadosAlterados = false;
+        System.out.println("Dados salvos com sucesso!");
+        
+    } catch (IOException e) {
+        System.out.println("Erro ao salvar dados: " + e.getMessage());
     }
+}
 
     public void consultaVeiculo(Scanner sc) {
+        System.out.println("Atributos disponíveis: modelo, cor, ano, cidade");
         System.out.print("Informe o atributo: ");
-        System.out.println("Atributos: modelo, cor, ano, cidade");
 
         String atributo = sc.nextLine().trim().toLowerCase();
-        System.out.print("Informe o valor: ");
+        System.out.print("Informe o valor do atributo: ");
         String valor = sc.nextLine().trim().toLowerCase();
 
         ArrayList<Veiculo> encontrados = new ArrayList<>();
@@ -94,9 +108,7 @@ public class Locadora {
         }
     }
 
-    public void realizarLocacao() {
-
-    Scanner sc = new Scanner(System.in);
+    public void realizarLocacao(Scanner sc) {
 
     System.out.print("Informe a cidade de origem: ");
     String cidade = sc.nextLine();
@@ -184,7 +196,76 @@ public class Locadora {
 
     }
 
-    public void realizaDevolucao() {
+    public void realizaDevolucao(Scanner sc) {
+
+        System.out.print("Informe o nome do cliente: ");
+        String nomeCliente = sc.nextLine().trim();
+
+        Locacao locacaoAtiva = null;
+        for (Locacao l : locacoes) {
+            if (l.cliente.equalsIgnoreCase(nomeCliente) && !l.veiculo.isDisponivel()) {
+            locacaoAtiva = l;
+            break;
+        }
+    }
+
+    if (locacaoAtiva == null) {
+        System.out.println("Nenhuma locação ativa encontrada para este cliente.");
+        return;
+    }
+
+    System.out.print("Informe a cidade de devolução: ");
+    String cidadeDevolucao = sc.nextLine().trim();
+
+    System.out.print("Informe a quilometragem percorrida: ");
+    int kmPercorrido = sc.nextInt();
+    sc.nextLine();
+
+    System.out.printf("Quantidade de diárias contratadas: %d%n", locacaoAtiva.qt_dias);
+    System.out.print("Confirma a quantidade de dias ou deseja informar um valor diferente? (S para confirmar / N para informar): ");
+    String resposta = sc.nextLine().trim();
+
+    int diasReais;
+    if (resposta.equalsIgnoreCase("S")) {
+        diasReais = locacaoAtiva.qt_dias;
+    } else {
+        System.out.print("Informe a quantidade real de dias utilizados: ");
+        diasReais = sc.nextInt();
+        sc.nextLine();
+    }
+
+    locacaoAtiva.qt_dias_realizado = diasReais;
+    locacaoAtiva.km_rodado = kmPercorrido;
+    locacaoAtiva.destino = cidadeDevolucao;
+
+    double valorDiariasContratadas = locacaoAtiva.qt_dias * locacaoAtiva.veiculo.getValor_diaria();
+    double ajusteDiarias = 0;
+
+    if (diasReais < locacaoAtiva.qt_dias) {
+
+        int diasNaoUsados = locacaoAtiva.qt_dias - diasReais;
+        ajusteDiarias = -(diasNaoUsados * locacaoAtiva.veiculo.getValor_diaria() * 0.20);
+        System.out.printf("Devolveu %d dia(s) antes. Desconto de 20%%: R$ %.2f%n", diasNaoUsados, Math.abs(ajusteDiarias));
+
+    } else if (diasReais > locacaoAtiva.qt_dias) {
+        int diasExtras = diasReais - locacaoAtiva.qt_dias;
+        ajusteDiarias = diasExtras * locacaoAtiva.veiculo.getValor_diaria() * 1.30;
+        System.out.printf("Devolveu %d dia(s) depois. Valor das diárias extras (com 30%% de multa): R$ %.2f%n", diasExtras, ajusteDiarias);
+    }
+
+    double valorKm = kmPercorrido * locacaoAtiva.veiculo.getValor_km_rodado();
+    System.out.printf("Valor referente aos quilômetros rodados: R$ %.2f%n", valorKm);
+
+    double totalFinal = valorDiariasContratadas + ajusteDiarias + valorKm;
+    System.out.printf("Valor total da locação: R$ %.2f%n", totalFinal);
+
+    locacaoAtiva.veiculo.setCidade(cidadeDevolucao);
+    locacaoAtiva.veiculo.setOdomentro(locacaoAtiva.veiculo.getOdomentro() + kmPercorrido);
+    locacaoAtiva.veiculo.setDisponivel(true);
+
+    dadosAlterados = true;
+
+    System.out.println("Devolução realizada com sucesso! Veículo liberado para nova locação.");
 
     }
 
