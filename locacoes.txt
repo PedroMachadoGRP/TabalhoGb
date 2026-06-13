@@ -1,1 +1,2 @@
 8	peterson	porto alegre		0	10	0
+12	Junior	Lages	Porto Alegre	50	2	2

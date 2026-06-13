@@ -8,7 +8,6 @@ public class Veiculo {
     private boolean disponivel;
     private double valor_diaria;
     private double valor_km_rodado;
-    private static String separador = ";";
 
     public Veiculo(int codigo, String modelo, String cor, int ano, int odomentro, String cidade, boolean disponivel,
             double valor_diaria, double valor_km_rodado) {
@@ -156,7 +155,7 @@ public class Veiculo {
         veiculo.setAno(Integer.parseInt(campos[3].trim()));
         veiculo.setOdomentro(Integer.parseInt(campos[4].trim()));
         veiculo.setCidade(campos[5].isEmpty() ? "N/A" : campos[5]);
-        veiculo.setDisponivel(campos[6].trim().equalsIgnoreCase("S"));
+        veiculo.setDisponivel(campos[6].trim().equalsIgnoreCase("S") || campos[6].trim().equalsIgnoreCase("true"));
         veiculo.setValor_diaria(Double.parseDouble(campos[7].trim()));
         veiculo.setValor_km_rodado(Double.parseDouble(campos[8].trim()));
         return veiculo;

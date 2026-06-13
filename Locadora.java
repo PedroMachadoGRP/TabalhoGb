@@ -19,6 +19,7 @@ public class Locadora {
 
     public void carregaDados() {
         carregaVeiculos();
+        carregaLocacoes();
     }
 
     private void carregaVeiculos() {
@@ -43,6 +44,60 @@ public class Locadora {
         } catch (IOException e) {
             System.out.println("Erro ao ler veiculos.txt: " + e.getMessage());
         }
+    }
+
+    private void carregaLocacoes() {
+        File arquivo = new File("locacoes.txt");
+
+        if (!arquivo.exists())
+            return;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(arquivo))) {
+            String linha;
+            while ((linha = br.readLine()) != null) {
+                if (linha.trim().isEmpty())
+                    continue;
+
+                try {
+                    String[] campos = linha.split("\t", -1);
+                    int codigoVeiculo = Integer.parseInt(campos[0].trim());
+                    Veiculo veiculo = buscarVeiculoPorCodigo(codigoVeiculo);
+
+                    if (veiculo == null) {
+                        System.out.println("Veículo da locação não encontrado: " + codigoVeiculo);
+                        continue;
+                    }
+
+                    Locacao locacao = new Locacao();
+                    locacao.veiculo = veiculo;
+                    locacao.cliente = campos[1];
+                    locacao.origem = campos[2];
+                    locacao.destino = campos[3].isEmpty() ? null : campos[3];
+                    locacao.km_rodado = Integer.parseInt(campos[4].trim());
+                    locacao.qt_dias = Integer.parseInt(campos[5].trim());
+                    locacao.qt_dias_realizado = Integer.parseInt(campos[6].trim());
+
+                    locacoes.add(locacao);
+
+                    if (!locacaoFinalizada(locacao))
+                        veiculo.setDisponivel(false);
+
+                } catch (Exception e) {
+                    System.out.println("Erro ao carregar locação: " + e.getMessage());
+                }
+            }
+
+        } catch (IOException e) {
+            System.out.println("Erro ao ler locacoes.txt: " + e.getMessage());
+        }
+    }
+
+    private Veiculo buscarVeiculoPorCodigo(int codigo) {
+        for (Veiculo v : veiculos) {
+            if (v.getCodigo() == codigo)
+                return v;
+        }
+        return null;
     }
 
     public void salvaDados() {
@@ -192,9 +247,34 @@ public class Locadora {
     System.out.println("Locação realizada com sucesso!");
     }
 
-    public void consultaLocacao() {
+    public void consultaLocacao(Scanner sc) {
+    System.out.print("Informe o nome do cliente ou modelo do veículo: ");
+    String valor = sc.nextLine().trim().toLowerCase();
 
+    boolean encontrou = false;
+
+    for (Locacao l : locacoes) {
+        if ((l.cliente != null && l.cliente.toLowerCase().contains(valor)) ||
+            (l.veiculo != null && l.veiculo.getModelo().toLowerCase().contains(valor))) {
+
+            encontrou = true;
+
+            System.out.println("\nCliente: " + l.cliente);
+            System.out.println("Veículo: " + l.veiculo.getModelo() + " - " + l.veiculo.getCor());
+            System.out.println("Ano: " + l.veiculo.getAno());
+            System.out.println("Origem: " + l.origem);
+            System.out.println("Destino: " + (l.destino == null ? "" : l.destino));
+            System.out.println("Km rodado: " + l.km_rodado);
+            System.out.println("Dias reservados: " + l.qt_dias);
+            System.out.println("Dias realizados: " + l.qt_dias_realizado);
+            System.out.println("Situação: " + (locacaoFinalizada(l) ? "Finalizada" : "Ativa"));
+        }
     }
+
+    if (!encontrou) {
+        System.out.println("Nenhuma locação encontrada.");
+    }
+}
 
     public void realizaDevolucao(Scanner sc) {
 
@@ -270,7 +350,67 @@ public class Locadora {
     }
 
     public void relatorioResumo() {
+        int totalKm = 0;
+        int totalDiasContratados = 0;
+        int totalDiasRealizados = 0;
+        double totalDiariasContratadas = 0;
+        double totalDiariasExtras = 0;
+        double totalKmRodado = 0;
+        double totalGeral = 0;
+        int quantidadeFinalizadas = 0;
 
+        for (Locacao l : locacoes) {
+            if (!locacaoFinalizada(l))
+                continue;
+            quantidadeFinalizadas++;
+            double valorDiariasContratadas = l.qt_dias * l.veiculo.getValor_diaria();
+            double valorExtras = 0;
+            double valorDesconto = 0;
+            double valorKm = l.km_rodado * l.veiculo.getValor_km_rodado();
+
+            if (l.qt_dias_realizado > l.qt_dias) {
+                int diasExtras = l.qt_dias_realizado - l.qt_dias;
+                valorExtras = diasExtras * l.veiculo.getValor_diaria() * 1.30;
+            } else if (l.qt_dias_realizado < l.qt_dias) {
+                int diasNaoUsados = l.qt_dias - l.qt_dias_realizado;
+                valorDesconto = diasNaoUsados * l.veiculo.getValor_diaria() * 0.20;
+            }
+
+            totalKm += l.km_rodado;
+            totalDiasContratados += l.qt_dias;
+            totalDiasRealizados += l.qt_dias_realizado;
+            totalDiariasContratadas += valorDiariasContratadas;
+            totalDiariasExtras += valorExtras;
+            totalKmRodado += valorKm;
+            totalGeral += valorDiariasContratadas + valorExtras - valorDesconto + valorKm;
+        }
+
+        if (quantidadeFinalizadas == 0) {
+            System.out.println("Nenhuma locação finalizada encontrada.");
+            return;
+        }
+
+        System.out.println("\nResumo das locações finalizadas");
+        System.out.println("Quantidade de locações finalizadas: " + quantidadeFinalizadas);
+        System.out.println("Total de km rodados: " + totalKm);
+        System.out.println("Total de dias contratados: " + totalDiasContratados);
+        System.out.println("Total de dias realizados: " + totalDiasRealizados);
+        System.out.printf("Valor das diárias contratadas: R$ %.2f%n", totalDiariasContratadas);
+        System.out.printf("Valor das diárias extras: R$ %.2f%n", totalDiariasExtras);
+        System.out.printf("Valor dos km rodados: R$ %.2f%n", totalKmRodado);
+        System.out.printf("Valor total das locações: R$ %.2f%n", totalGeral);
+    }
+
+    public void mostraIntegrantes() {
+        System.out.println("Integrantes do grupo:");
+        System.out.println("João Pedro Boniatti");
+        System.out.println("Otto Antonio Machado");
+        System.out.println("Pedro Machado");
+        System.out.println("Peterson Machado");
+    }
+
+    private boolean locacaoFinalizada(Locacao l) {
+        return l.destino != null && !l.destino.trim().isEmpty();
     }
 
     private void imprimirTabelaVeiculos(ArrayList<Veiculo> lista) {

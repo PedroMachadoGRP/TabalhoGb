@@ -12,6 +12,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         
         while (iniciar) {
+            System.out.println("Escolha uma opção:");
             System.out.println("1 - Consultar veículos");
             System.out.println("2 - Realizar locação");
             System.out.println("3 - Realizar devolução");
@@ -35,13 +36,16 @@ public class Main {
                     locadora.realizaDevolucao(sc);
                     break;
                 case 4:
+                    locadora.consultaLocacao(sc);
                     break;
                 case 5:
+                    locadora.relatorioResumo();
                     break;
                 case 6:
                     locadora.salvaDados();
                     break;
                 case 7:
+                    locadora.mostraIntegrantes();
                     break;
                 case 8:
                     locadora.salvaDados();

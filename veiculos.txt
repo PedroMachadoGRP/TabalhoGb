@@ -8,3 +8,4 @@
 8	Duster	Branco	2018	57114	Porto Alegre	false	118.17	1.05
 9	Cruze	Preto	2020	8013	Pelotas	false	120.63	1.08
 10	Argo	Vermelho	2017	106857	Lages	true	91.96	0.63
+12	Argo	Verde	2017	106907	Porto Alegre	true	91.96	0.63
