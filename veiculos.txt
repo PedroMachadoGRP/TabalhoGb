@@ -1,7 +1,7 @@
 1	Gol	Cinza	2016	137852	Porto Alegre	true	108.67	0.93
 2	Up	Branco	2017	86541	S�o Leopoldo	false	70.12	0.47
 3	Argo	Preto	2019	42876	Canoas	true	121.4	1.02
-4	Mobi	Vermelho	2018	61907	Curitiba	true	76.19	0.39
+4	Mobi	Vermelho	2018	61912	Canoas	true	76.19	0.39
 5	Gol	Azul	2019	49389	Blumenau	false	77.47	0.51
 6	Onix	Prata	2017	77635	Florian�polis	false	78.74	0.55
 7	Sandero	Cinza	2019	34518	S�o Leopoldo	true	82.61	0.64

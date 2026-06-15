@@ -2,6 +2,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        //Inicia a função do menu para o programa
         menu();
     }
 
@@ -11,6 +12,7 @@ public class Main {
         locadora.carregaDados();
         Scanner sc = new Scanner(System.in);
         
+        //Laço de repetição para uso de cada função
         while (iniciar) {
             System.out.println("Escolha uma opção:");
             System.out.println("1 - Consultar veículos");
@@ -25,6 +27,7 @@ public class Main {
             int escolha = sc.nextInt();
             sc.nextLine();
 
+            //Condicional para a escolha da função desejada
             switch (escolha) {
                 case 1:
                     locadora.consultaVeiculo(sc);
